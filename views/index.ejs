@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Meeting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f7f9fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #111;
+      text-align: center;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #007aff;
+    }
+    button {
+      background: #007aff;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #005fc1;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📅 Book a Meeting</h1>
+    <form action="/book" method="POST">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Your email" required>
+      <input type="text" name="phone" placeholder="Phone number" required>
+      <input type="date" name="date" id="date" required>
+
+      <select name="time" id="time-slot" required>
+        <option value="">Select a time slot</option>
+      </select>
+
+      <button type="submit">Book Now</button>
+    </form>
+  </div>
+
+  <script>
+    const slotMap = {
+      '2025-04-01': ['09:00 AM', '10:30 AM', '02:00 PM'],
+      '2025-04-03': ['11:00 AM', '01:00 PM'],
+      '2025-04-07': ['10:00 AM', '12:00 PM', '03:00 PM'],
+      '2025-04-10': ['09:30 AM', '11:30 AM'],
+      '2025-04-15': ['01:00 PM', '04:00 PM'],
+      '2025-04-20': ['09:00 AM', '10:00 AM'],
+      '2025-04-25': ['11:00 AM', '01:00 PM', '02:30 PM']
+    };
+
+    const dateInput = document.getElementById('date');
+    const timeSelect = document.getElementById('time-slot');
+
+    dateInput.addEventListener('change', () => {
+      const selectedDate = dateInput.value;
+      const times = slotMap[selectedDate] || [];
+
+      // Clear current options
+      timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+
+      times.forEach(time => {
+        const option = document.createElement('option');
+        option.value = time;
+        option.textContent = time;
+        timeSelect.appendChild(option);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin – Set Availability</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 60px auto;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #007aff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>📅 Set Available Time Slots</h2>
+  <form action="/admin/save" method="POST">
+    <label>Select Date</label>
+    <input type="date" name="date" required>
+
+    <label>Time Slots (comma separated)</label>
+    <textarea name="times" rows="4" placeholder="e.g. 09:00 AM, 10:30 AM, 2:00 PM" required></textarea>
+
+    <button type="submit">Save Slots</button>
+  </form>
+</body>
+</html>
