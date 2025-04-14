@@ -22,9 +22,21 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/book', async (req, res) => {
-  const { name, email, phone, date, time, slot_id } = req.body;
+  const { name, email, phone, date, slot_id } = req.body;
 
   try {
+    // Lookup the time for the selected slot
+    const timeResult = await pool.query(
+      'SELECT time FROM available_time_slots WHERE id = $1',
+      [slot_id]
+    );
+
+    const time = timeResult.rows[0]?.time;
+
+    if (!time) {
+      return res.status(400).send('❌ Invalid time slot selected.');
+    }
+
     // 1. Save booking to database
     await pool.query(
       'INSERT INTO bookings (name, email, phone, date, time, slot_id) VALUES ($1, $2, $3, $4, $5, $6)',
