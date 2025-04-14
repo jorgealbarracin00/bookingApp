@@ -52,7 +52,7 @@ router.post('/book', async (req, res) => {
     console.log(`📅 Booking confirmed for ${name} at ${date} ${time}`);
     res.send('✅ Booking confirmed!');
   } catch (error) {
-    console.error('❌ Booking error:', error);
+    console.error('❌ Booking error:', error.message);
     res.status(500).send('❌ Failed to book time slot');
   }
 });
