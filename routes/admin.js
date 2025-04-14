@@ -1,28 +1,27 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-
 const router = express.Router();
-const slotsFile = path.join(__dirname, '..', 'slots.json');
+const pool = require('../db'); // assuming db.js is in the root
 
 router.get('/admin', (req, res) => {
   res.render('admin');
 });
 
-router.post('/admin/save', (req, res) => {
+router.post('/admin/save', async (req, res) => {
   const { date, times } = req.body;
-
   const timeArray = times.split(',').map(t => t.trim());
 
-  fs.readFile(slotsFile, 'utf-8', (err, data) => {
-    const json = data ? JSON.parse(data) : {};
-    json[date] = timeArray;
-
-    fs.writeFile(slotsFile, JSON.stringify(json, null, 2), err => {
-      if (err) return res.send('Error saving slots');
-      res.send('✅ Slots saved!');
-    });
-  });
+  try {
+    for (const time of timeArray) {
+      await pool.query(
+        'INSERT INTO available_time_slots (date, time) VALUES ($1, $2)',
+        [date, time]
+      );
+    }
+    res.send('✅ Slots saved to database!');
+  } catch (error) {
+    console.error('Error saving slots:', error);
+    res.status(500).send('❌ Failed to save slots');
+  }
 });
 
 module.exports = router;

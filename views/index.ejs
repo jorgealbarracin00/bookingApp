@@ -74,42 +74,19 @@
       <input type="text" name="phone" placeholder="Phone number" required>
       <input type="date" name="date" id="date" required>
 
-      <select name="time" id="time-slot" required>
+      <select name="slot_id" required>
         <option value="">Select a time slot</option>
+        <% if (slots && slots.length > 0) { %>
+          <% slots.forEach(slot => { %>
+            <option value="<%= slot.id %>"><%= slot.date %> – <%= slot.time %></option>
+          <% }); %>
+        <% } else { %>
+          <option disabled>No slots available</option>
+        <% } %>
       </select>
 
       <button type="submit">Book Now</button>
     </form>
   </div>
-
-  <script>
-    const slotMap = {
-      '2025-04-01': ['09:00 AM', '10:30 AM', '02:00 PM'],
-      '2025-04-03': ['11:00 AM', '01:00 PM'],
-      '2025-04-07': ['10:00 AM', '12:00 PM', '03:00 PM'],
-      '2025-04-10': ['09:30 AM', '11:30 AM'],
-      '2025-04-15': ['01:00 PM', '04:00 PM'],
-      '2025-04-20': ['09:00 AM', '10:00 AM'],
-      '2025-04-25': ['11:00 AM', '01:00 PM', '02:30 PM']
-    };
-
-    const dateInput = document.getElementById('date');
-    const timeSelect = document.getElementById('time-slot');
-
-    dateInput.addEventListener('change', () => {
-      const selectedDate = dateInput.value;
-      const times = slotMap[selectedDate] || [];
-
-      // Clear current options
-      timeSelect.innerHTML = '<option value="">Select a time slot</option>';
-
-      times.forEach(time => {
-        const option = document.createElement('option');
-        option.value = time;
-        option.textContent = time;
-        timeSelect.appendChild(option);
-      });
-    });
-  </script>
 </body>
 </html>
