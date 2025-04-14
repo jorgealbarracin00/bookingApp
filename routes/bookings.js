@@ -10,8 +10,7 @@ router.get('/', async (req, res) => {
   if (selectedDate) {
     try {
       const result = await pool.query(
-        'SELECT id, time FROM available_time_slots WHERE date = $1 AND booked = false ORDER BY time',
-        [selectedDate]
+      'SELECT id, time FROM available_time_slots WHERE date = $1 AND (booked = false OR booked IS NULL) ORDER BY time',        [selectedDate]
       );
       timeSlots = result.rows;
     } catch (err) {
