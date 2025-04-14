@@ -68,25 +68,34 @@
 <body>
   <div class="card">
     <h1>📅 Book a Meeting</h1>
-    <form action="/book" method="POST">
-      <input type="text" name="name" placeholder="Your name" required>
-      <input type="email" name="email" placeholder="Your email" required>
-      <input type="text" name="phone" placeholder="Phone number" required>
-      <input type="date" name="date" id="date" required>
 
-      <select name="slot_id" required>
-        <option value="">Select a time slot</option>
-        <% if (slots && slots.length > 0) { %>
-          <% slots.forEach(slot => { %>
-            <option value="<%= slot.id %>"><%= slot.date %> – <%= slot.time %></option>
-          <% }); %>
-        <% } else { %>
-          <option disabled>No slots available</option>
-        <% } %>
-      </select>
-
-      <button type="submit">Book Now</button>
+    <!-- Step 1: Date Selection -->
+    <form method="GET" action="/">
+      <input type="date" name="date" value="<%= selectedDate || '' %>" required>
+      <button type="submit">Check Availability</button>
     </form>
+
+    <!-- Step 2: Show time slots if date selected -->
+    <% if (selectedDate && timeSlots && timeSlots.length > 0) { %>
+      <form action="/book" method="POST">
+        <input type="hidden" name="date" value="<%= selectedDate %>">
+
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="email" name="email" placeholder="Your email" required>
+        <input type="text" name="phone" placeholder="Phone number" required>
+
+        <select name="slot_id" required>
+          <option value="">Select a time slot</option>
+          <% timeSlots.forEach(slot => { %>
+            <option value="<%= slot.id %>"><%= slot.time %></option>
+          <% }); %>
+        </select>
+
+        <button type="submit">Book Now</button>
+      </form>
+    <% } else if (selectedDate) { %>
+      <p>No available time slots for <%= selectedDate %>.</p>
+    <% } %>
   </div>
 </body>
 </html>

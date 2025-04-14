@@ -4,15 +4,18 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  try {
+  const selectedDate = req.query.date;
+  let timeSlots = [];
+
+  if (selectedDate) {
     const result = await pool.query(
-      'SELECT * FROM available_time_slots WHERE booked = false ORDER BY date, time'
+      'SELECT id, time FROM available_time_slots WHERE date = $1 AND booked = false',
+      [selectedDate]
     );
-    res.render('index', { slots: result.rows });
-  } catch (error) {
-    console.error('Error loading available slots:', error);
-    res.status(500).send('❌ Failed to load booking form');
+    timeSlots = result.rows;
   }
+
+  res.render('index', { timeSlots, selectedDate });
 });
 
 router.post('/book', async (req, res) => {
