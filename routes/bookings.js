@@ -8,11 +8,15 @@ router.get('/', async (req, res) => {
   let timeSlots = [];
 
   if (selectedDate) {
-    const result = await pool.query(
-      'SELECT id, time FROM available_time_slots WHERE date = $1 AND booked = false',
-      [selectedDate]
-    );
-    timeSlots = result.rows;
+    try {
+      const result = await pool.query(
+        'SELECT id, time FROM available_time_slots WHERE date = $1 AND booked = false ORDER BY time',
+        [selectedDate]
+      );
+      timeSlots = result.rows;
+    } catch (err) {
+      console.error('Error fetching slots:', err);
+    }
   }
 
   res.render('index', { timeSlots, selectedDate });
