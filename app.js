@@ -10,12 +10,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
 // Routes
-const { router } = require('./routes/bookings');
-app.use(router);
+const bookingRoutes = require('./routes/bookings');
+app.use('/', bookingRoutes);
 
 // Admin
 const adminRoutes = require('./routes/admin');
-app.use('/', adminRoutes);
+app.use('/admin', adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

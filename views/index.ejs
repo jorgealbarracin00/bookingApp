@@ -64,16 +64,6 @@
       background: #005fc1;
     }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAgj8wiE-bK3Y2CmiaiAwAyfHMF5LYw1qQ",
-      authDomain: "bookingapp-70f7b.firebaseapp.com",
-      projectId: "bookingapp-70f7b"
-    };
-    firebase.initializeApp(firebaseConfig);
-  </script>
 </head>
 <body>
   <div class="card">
@@ -107,46 +97,5 @@
       <p>No available time slots for <%= selectedDate %>.</p>
     <% } %>
   </div>
-  <div class="card" style="margin-top: 20px;">
-    <h1>🔒 Admin Login</h1>
-    <input type="email" id="admin-email" placeholder="Admin email" required>
-    <input type="password" id="admin-password" placeholder="Password" required>
-    <button onclick="loginAsAdmin()">Login as Admin</button>
-    <button onclick="logout()">Logout</button>
-  </div>
-  <script>
-    function loginAsAdmin() {
-      const email = document.getElementById('admin-email').value;
-      const password = document.getElementById('admin-password').value;
-
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(userCredential => userCredential.user.getIdToken())
-        .then(token => {
-          return fetch('/admin', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-        })
-        .then(res => res.text())
-        .then(html => {
-          document.open();
-          document.write(html);
-          document.close();
-        })
-        .catch(error => {
-          alert('Login failed: ' + error.message);
-        });
-    }
-
-    function logout() {
-      firebase.auth().signOut().then(() => {
-        alert('Logged out successfully.');
-        location.reload();
-      }).catch((error) => {
-        alert('Logout failed: ' + error.message);
-      });
-    }
-  </script>
 </body>
 </html>
