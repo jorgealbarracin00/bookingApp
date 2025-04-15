@@ -20,7 +20,7 @@ async function verifyFirebaseToken(req, res, next) {
   }
 }
 
-router.get('/admin', verifyFirebaseToken, (req, res) => {
+router.get('/', verifyFirebaseToken, (req, res) => {
   res.render('admin');
 });
 
