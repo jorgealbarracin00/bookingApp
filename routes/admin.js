@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db'); // assuming db.js is in the root
-const admin = require('firebase-admin');
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-}
+const admin = require('../firebase');
 
 async function verifyFirebaseToken(req, res, next) {
   const idToken = req.headers.authorization?.split('Bearer ')[1];
