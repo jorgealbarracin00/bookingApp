@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
 // Routes
-const bookingRoutes = require('./routes/bookings');
+const { router } = require('./routes/bookings');
 app.use(router);
 
 // Admin
