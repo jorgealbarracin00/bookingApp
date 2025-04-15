@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 
 // Routes
 const bookingRoutes = require('./routes/bookings');
-app.use('/', bookingRoutes);
+app.use(router);
 
 // Admin
 const adminRoutes = require('./routes/admin');
