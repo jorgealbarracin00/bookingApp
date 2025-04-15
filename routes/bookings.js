@@ -23,9 +23,10 @@ router.get('/', async (req, res) => {
 
 router.post('/book', async (req, res) => {
   const { name, email, phone, date, slot_id } = req.body;
+  console.log('🧾 Booking Request Body:', req.body);
 
   try {
-    // Lookup the time for the selected slot
+    console.log('🔍 Fetching time for slot ID:', slot_id);
     const timeResult = await pool.query(
       'SELECT time FROM available_time_slots WHERE id = $1',
       [slot_id]
@@ -34,22 +35,25 @@ router.post('/book', async (req, res) => {
     const time = timeResult.rows[0]?.time;
 
     if (!time) {
+      console.error('❌ Invalid time slot selected');
       return res.status(400).send('❌ Invalid time slot selected.');
     }
 
-    // 1. Save booking to database
+    console.log('📥 Inserting booking...');
     await pool.query(
       'INSERT INTO bookings (name, email, phone, date, time, slot_id) VALUES ($1, $2, $3, $4, $5, $6)',
       [name, email, phone, date, time, slot_id]
     );
+    console.log('✅ Booking inserted');
 
-    // 2. Mark time slot as booked
+    console.log('📦 Updating time slot to booked...');
     await pool.query(
       'UPDATE available_time_slots SET booked = true WHERE id = $1',
       [slot_id]
     );
+    console.log('✅ Slot updated');
 
-    // 3. Send confirmation emails
+    console.log('📧 Sending emails...');
     const nodemailer = require('nodemailer');
 
     const transporter = nodemailer.createTransport({
@@ -81,7 +85,7 @@ router.post('/book', async (req, res) => {
     res.send('✅ Booking confirmed!');
   } catch (error) {
     console.error('❌ Booking error:', error.message);
-    res.status(500).send('❌ Failed to book time slot');
+    res.status(500).send('❌ Failed to book time slot: ' + error.message);
   }
 });
 
