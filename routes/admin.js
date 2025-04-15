@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db'); // assuming db.js is in the root
 const admin = require('firebase-admin');
-const serviceAccount = require('../firebase-admin-key.json');
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 if (!admin.apps.length) {
   admin.initializeApp({
