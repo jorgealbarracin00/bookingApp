@@ -20,8 +20,12 @@ async function verifyFirebaseToken(req, res, next) {
   }
 }
 
-router.get('/', verifyFirebaseToken, (req, res) => {
-  res.render('admin');
+router.get('/login', (req, res) => {
+  res.render('admin-login'); // Public login screen
+});
+
+router.get('/dashboard', verifyFirebaseToken, (req, res) => {
+  res.render('admin'); // Protected admin view
 });
 
 router.post('/admin/save', verifyFirebaseToken, async (req, res) => {
