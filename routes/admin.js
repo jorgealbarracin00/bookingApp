@@ -3,6 +3,10 @@ const router = express.Router();
 const pool = require('../db'); // assuming db.js is in the root
 const admin = require('../firebase');
 
+router.get('/', (req, res) => {
+  res.redirect('/admin/login');
+});
+
 async function verifyFirebaseToken(req, res, next) {
   const idToken = req.headers.authorization?.split('Bearer ')[1];
 
