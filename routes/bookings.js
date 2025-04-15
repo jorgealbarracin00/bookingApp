@@ -141,4 +141,4 @@ async function sendReminderEmails() {
   }
 }
 
-module.exports = { router, sendReminderEmails };
+module.exports = router;
