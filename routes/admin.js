@@ -36,7 +36,7 @@ router.get('/dashboard', verifyFirebaseToken, (req, res) => {
   res.render('admin'); // Protected admin view
 });
 
-router.post('/admin/save', verifyFirebaseToken, async (req, res) => {
+router.post('/save', verifyFirebaseToken, async (req, res) => {
   const { date, times } = req.body;
   const timeArray = times.split(',').map(t => t.trim());
 
