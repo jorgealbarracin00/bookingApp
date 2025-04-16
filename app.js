@@ -1,10 +1,11 @@
 const express = require('express');
+const app = express(); // ✅ Move this to the top
+
 app.use('/assets', express.static('assets'));
+
 const bodyParser = require('body-parser');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-
-const app = express();
 
 app.use(cookieParser());
 
