@@ -1,8 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const app = express();
+
+app.use(cookieParser());
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
