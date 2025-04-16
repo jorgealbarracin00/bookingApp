@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db'); // assuming db.js is in the root
 const admin = require('../firebase');
+const cookieParser = require('cookie-parser'); // Make sure app.js uses this
 
 router.get('/', (req, res) => {
   res.redirect('/admin/login');
 });
 
 async function verifyFirebaseToken(req, res, next) {
-  const idToken = req.headers.authorization?.split('Bearer ')[1];
+  const authHeader = req.headers.authorization;
+  const idToken = authHeader?.startsWith('Bearer ')
+    ? authHeader.split('Bearer ')[1]
+    : req.cookies.token; // fallback to token from cookie
 
   if (!idToken) {
     return res.status(401).send('Unauthorized: No token provided');
