@@ -1,4 +1,5 @@
 const express = require('express');
+app.use('/assets', express.static('assets'));
 const bodyParser = require('body-parser');
 const path = require('path');
 const cookieParser = require('cookie-parser');
