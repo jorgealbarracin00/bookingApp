@@ -70,7 +70,9 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     weekDays,
     timeLabels,
     slotMap,
-    currentOffset: offset
+    currentOffset: offset,
+    success: req.query.success,
+    error: req.query.error
   });
 });
 
