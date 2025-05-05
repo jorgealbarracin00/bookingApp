@@ -18,11 +18,11 @@ router.get('/', async (req, res) => {
     weekDays.push({ date: isoDate, label });
   }
 
-  const timeLabels = [
-    '09:00', '09:30', '10:00', '10:30', '11:00',
-    '11:30', '12:00', '12:30', '13:00', '13:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00'
-  ];
+  const timeLabels = [];
+  for (let h = 9; h < 21; h++) {
+    timeLabels.push(`${h.toString().padStart(2, '0')}:00`);
+    timeLabels.push(`${h.toString().padStart(2, '0')}:30`);
+  }
 
   const weeklySlots = {};
 
