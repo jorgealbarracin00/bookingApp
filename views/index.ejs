@@ -119,41 +119,46 @@
         <button type="submit">Next →</button>
       </form>
     </div>
-    <form action="/book" method="POST">
+    <form id="userDataForm">
       <input type="text" name="name" placeholder="Your name" value="<%= formData?.name || '' %>" required>
       <input type="email" name="email" placeholder="Your email" value="<%= formData?.email || '' %>" required>
       <input type="text" name="phone" placeholder="Phone number" value="<%= formData?.phone || '' %>" required>
+    </form>
 
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+          <tr>
+            <% weekDays.forEach(day => { %>
+              <th style="padding: 10px; text-align: center; color: #333;"><%= day.label %><br><small><%= day.date %></small></th>
+            <% }); %>
+          </tr>
+        </thead>
+        <tbody>
+          <% timeLabels.forEach((label, rowIndex) => { %>
             <tr>
-              <% weekDays.forEach(day => { %>
-                <th style="padding: 10px; text-align: center; color: #333;"><%= day.label %><br><small><%= day.date %></small></th>
+              <% weekDays.forEach(day => {
+                   const slotsForDay = weeklySlots[day.date] || [];
+                   const slot = slotsForDay.find(s => s.time === label);
+              %>
+                <td style="padding: 6px; text-align: center;">
+                  <% if (slot && slot.available) { %>
+                    <form method="POST" action="/book" style="margin: 0;">
+                      <input type="hidden" name="name" value="<%= formData?.name || '' %>">
+                      <input type="hidden" name="email" value="<%= formData?.email || '' %>">
+                      <input type="hidden" name="phone" value="<%= formData?.phone || '' %>">
+                      <button type="submit" name="slot_id" value="<%= slot.id %>" style="background-color: #00ff90; border: none; border-radius: 4px; width: 50px; height: 25px; cursor: pointer;"></button>
+                    </form>
+                  <% } else { %>
+                    <div style="background-color: #ff4d4d; border-radius: 4px; width: 50px; height: 25px;"></div>
+                  <% } %>
+                </td>
               <% }); %>
             </tr>
-          </thead>
-          <tbody>
-            <% timeLabels.forEach((label, rowIndex) => { %>
-              <tr>
-                <% weekDays.forEach(day => {
-                     const slotsForDay = weeklySlots[day.date] || [];
-                     const slot = slotsForDay.find(s => s.time === label);
-                %>
-                  <td style="padding: 6px; text-align: center;">
-                    <% if (slot && slot.available) { %>
-                      <button type="submit" name="slot_id" value="<%= slot.id %>" style="background-color: #00ff90; border: none; border-radius: 4px; width: 50px; height: 25px; cursor: pointer;"></button>
-                    <% } else { %>
-                      <div style="background-color: #ff4d4d; border-radius: 4px; width: 50px; height: 25px;"></div>
-                    <% } %>
-                  </td>
-                <% }); %>
-              </tr>
-            <% }); %>
-          </tbody>
-        </table>
-      </div>
-    </form>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
   </div>
 <script>
   setTimeout(() => {
