@@ -44,6 +44,15 @@ router.get('/', async (req, res) => {
       });
     }
 
+    // 🧪 DEBUG weeklySlots:
+    console.log('🧪 DEBUG weeklySlots:');
+    for (const date in weeklySlots) {
+      console.log(`📅 ${date}`);
+      for (const slot of weeklySlots[date]) {
+        console.log(`  ⏰ ${slot.time} → ${slot.available ? '✅' : '❌'}`);
+      }
+    }
+
     res.render('index', {
       weekDays,
       timeLabels,
