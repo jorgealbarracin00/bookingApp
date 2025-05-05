@@ -36,8 +36,9 @@ router.get('/', async (req, res) => {
     );
 
     for (const row of result.rows) {
-      if (!weeklySlots[row.date]) weeklySlots[row.date] = [];
-      weeklySlots[row.date].push({
+      const slotDate = new Date(row.date).toISOString().split('T')[0];
+      if (!weeklySlots[slotDate]) weeklySlots[slotDate] = [];
+      weeklySlots[slotDate].push({
         id: row.id,
         time: row.time,
         available: !row.booked
