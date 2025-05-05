@@ -28,7 +28,10 @@ router.get('/', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id, date, time, booked FROM available_time_slots WHERE date >= $1 AND date <= $2 ORDER BY date, time',
+      `SELECT id, date, to_char(time::time, 'HH24:MI') AS time, booked
+       FROM available_time_slots
+       WHERE date >= $1 AND date <= $2
+       ORDER BY date, time`,
       [weekDays[0].date, weekDays[6].date]
     );
 
@@ -36,7 +39,7 @@ router.get('/', async (req, res) => {
       if (!weeklySlots[row.date]) weeklySlots[row.date] = [];
       weeklySlots[row.date].push({
         id: row.id,
-        time: row.time.slice(0, 5),
+        time: row.time,
         available: !row.booked
       });
     }
