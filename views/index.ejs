@@ -15,9 +15,9 @@
       background: linear-gradient(to bottom right, #f7f9fb, #e0ecf8);
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      padding-top: 100px;
+      padding: 120px 20px 40px;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
     .card {
       background: #fff;
@@ -129,6 +129,7 @@
       <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
         <thead>
           <tr>
+            <th style="padding: 10px; text-align: center; color: #333;">Time</th>
             <% weekDays.forEach(day => { %>
               <th style="padding: 10px; text-align: center; color: #333;"><%= day.label %><br><small><%= day.date %></small></th>
             <% }); %>
@@ -137,9 +138,10 @@
         <tbody>
           <% timeLabels.forEach((label, rowIndex) => { %>
             <tr>
+              <td style="padding: 6px; text-align: center; font-weight: bold; color: #444;"><%= label %></td>
               <% weekDays.forEach(day => {
                    const slotsForDay = weeklySlots[day.date] || [];
-                   const slot = slotsForDay.find(s => s.time === label);
+                   const slot = slotsForDay.find(s => s.time.trim() === label.trim());
               %>
                 <td style="padding: 6px; text-align: center;">
                   <% if (slot && slot.available) { %>
