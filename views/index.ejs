@@ -166,6 +166,27 @@
   setTimeout(() => {
     document.querySelectorAll('.toast').forEach(el => el.remove());
   }, 4000);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('form[action="/book"]').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        const name = document.querySelector('input[name="name"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        const phone = document.querySelector('input[name="phone"]').value.trim();
+
+        if (!name || !email || !phone) {
+          e.preventDefault();
+          alert("Please fill in your name, email, and phone number before booking.");
+          return;
+        }
+
+        const confirmed = confirm(`Confirm your booking with the following info:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}`);
+        if (!confirmed) {
+          e.preventDefault();
+        }
+      });
+    });
+  });
 </script>
 </body>
 </html>

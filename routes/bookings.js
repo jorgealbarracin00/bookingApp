@@ -137,11 +137,16 @@ router.post('/book', async (req, res) => {
       text: `New booking: ${name}, ${email}, ${phone} at ${date} ${time}.`
     };
 
-    await transporter.sendMail(userMailOptions);
-    await transporter.sendMail(adminMailOptions);
-
     console.log(`📅 Booking confirmed for ${name} at ${date} ${time}`);
     res.redirect(`/?weekOffset=0&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&success=1`);
+
+    try {
+      await transporter.sendMail(userMailOptions);
+      await transporter.sendMail(adminMailOptions);
+      console.log('📧 Emails sent successfully');
+    } catch (emailErr) {
+      console.warn('⚠️ Email sending failed:', emailErr.message);
+    }
   } catch (error) {
     console.error('❌ Booking error:', error.message);
     res.redirect(`/?weekOffset=0&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&error=1`);
