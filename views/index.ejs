@@ -81,6 +81,16 @@
   </div>
   <div class="card">
     <h1>📅 Book a Meeting</h1>
+    <% if (typeof success !== 'undefined') { %>
+      <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 12px; text-align: center;">
+        ✅ Your booking was successful!
+      </div>
+    <% } %>
+    <% if (typeof error !== 'undefined') { %>
+      <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 12px; text-align: center;">
+        ❌ Something went wrong. Please try again.
+      </div>
+    <% } %>
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
       <form method="GET" action="/" style="margin: 0;">
         <input type="hidden" name="weekOffset" value="<%= currentOffset - 1 %>">
@@ -92,9 +102,9 @@
       </form>
     </div>
     <form action="/book" method="POST">
-      <input type="text" name="name" placeholder="Your name" required>
-      <input type="email" name="email" placeholder="Your email" required>
-      <input type="text" name="phone" placeholder="Phone number" required>
+      <input type="text" name="name" placeholder="Your name" value="<%= formData?.name || '' %>" required>
+      <input type="email" name="email" placeholder="Your email" value="<%= formData?.email || '' %>" required>
+      <input type="text" name="phone" placeholder="Phone number" value="<%= formData?.phone || '' %>" required>
 
       <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
@@ -127,5 +137,10 @@
       </div>
     </form>
   </div>
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.card > div[style*="background"]').forEach(el => el.remove());
+  }, 4000);
+</script>
 </body>
 </html>

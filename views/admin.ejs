@@ -27,12 +27,12 @@
 </head>
 <body>
   <h2>📅 Set Available Time Slots</h2>
-  <% if (typeof success !== 'undefined') { %>
+  <% if (success) { %>
     <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
       ✅ Time slots saved successfully!
     </div>
   <% } %>
-  <% if (typeof error !== 'undefined') { %>
+  <% if (error) { %>
     <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
       ❌ An error occurred while saving slots. Please try again.
     </div>
@@ -89,7 +89,9 @@
 
   <script>
     function toggleDay(day, source) {
-      document.querySelectorAll('.' + day).forEach(cb => cb.checked = source.checked);
+      document.querySelectorAll('input.slotBox.' + CSS.escape(day)).forEach(cb => {
+        cb.checked = source.checked;
+      });
     }
 
     function toggleAll(value) {

@@ -4,12 +4,15 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
+  const currentOffset = parseInt(req.query.weekOffset || 0);
   const today = new Date();
   const weekDays = [];
 
+  const start = new Date(today);
+  start.setDate(start.getDate() - start.getDay() + 1 + currentOffset * 7); // Monday
   for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
     const isoDate = date.toISOString().split('T')[0];
     const label = date.toLocaleDateString('en-AU', { weekday: 'short' });
     weekDays.push({ date: isoDate, label });
@@ -38,7 +41,17 @@ router.get('/', async (req, res) => {
       });
     }
 
-    res.render('index', { weekDays, timeLabels, weeklySlots });
+    res.render('index', {
+      weekDays,
+      timeLabels,
+      weeklySlots,
+      currentOffset,
+      formData: {
+        name: req.query.name || '',
+        email: req.query.email || '',
+        phone: req.query.phone || ''
+      }
+    });
   } catch (err) {
     console.error('❌ Error fetching weekly slots:', err);
     res.status(500).send('Server error');
@@ -113,10 +126,10 @@ router.post('/book', async (req, res) => {
     await transporter.sendMail(adminMailOptions);
 
     console.log(`📅 Booking confirmed for ${name} at ${date} ${time}`);
-    res.send('✅ Booking confirmed!');
+    res.redirect(`/?weekOffset=0&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&success=1`);
   } catch (error) {
     console.error('❌ Booking error:', error.message);
-    res.status(500).send('❌ Failed to book time slot: ' + error.message);
+    res.redirect(`/?weekOffset=0&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&error=1`);
   }
 });
 
