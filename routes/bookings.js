@@ -50,7 +50,9 @@ router.get('/', async (req, res) => {
         name: req.query.name || '',
         email: req.query.email || '',
         phone: req.query.phone || ''
-      }
+      },
+      success: req.query.success,
+      error: req.query.error
     });
   } catch (err) {
     console.error('❌ Error fetching weekly slots:', err);

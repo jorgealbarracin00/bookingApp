@@ -69,6 +69,28 @@
       height: auto;
       width: auto;
     }
+    .toast {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      z-index: 9999;
+      animation: slideIn 0.5s ease forwards;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .toast-success {
+      background-color: #28a745;
+    }
+    .toast-error {
+      background-color: #dc3545;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
   </style>
 </head>
 <body>
@@ -82,14 +104,10 @@
   <div class="card">
     <h1>📅 Book a Meeting</h1>
     <% if (success) { %>
-      <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 12px; text-align: center;">
-        ✅ Your booking was successful!
-      </div>
+      <div class="toast toast-success">✅ Your booking was successful!</div>
     <% } %>
     <% if (error) { %>
-      <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 12px; text-align: center;">
-        ❌ Something went wrong. Please try again.
-      </div>
+      <div class="toast toast-error">❌ Something went wrong. Please try again.</div>
     <% } %>
     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
       <form method="GET" action="/" style="margin: 0;">
@@ -139,7 +157,7 @@
   </div>
 <script>
   setTimeout(() => {
-    document.querySelectorAll('.card > div[style*="background"]').forEach(el => el.remove());
+    document.querySelectorAll('.toast').forEach(el => el.remove());
   }, 4000);
 </script>
 </body>
