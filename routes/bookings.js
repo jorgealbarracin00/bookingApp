@@ -4,25 +4,49 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const selectedDate = req.query.date;
-  let timeSlots = [];
+  const today = new Date();
+  const weekDays = [];
 
-  if (selectedDate) {
-    try {
-      const result = await pool.query(
-      'SELECT id, time FROM available_time_slots WHERE date = $1 AND (booked = false OR booked IS NULL) ORDER BY time',        [selectedDate]
-      );
-      timeSlots = result.rows;
-    } catch (err) {
-      console.error('Error fetching slots:', err);
-    }
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const isoDate = date.toISOString().split('T')[0];
+    const label = date.toLocaleDateString('en-AU', { weekday: 'short' });
+    weekDays.push({ date: isoDate, label });
   }
 
-  res.render('index', { timeSlots, selectedDate });
+  const timeLabels = [
+    '09:00', '09:30', '10:00', '10:30', '11:00',
+    '11:30', '12:00', '12:30', '13:00', '13:30',
+    '14:00', '14:30', '15:00', '15:30', '16:00'
+  ];
+
+  const weeklySlots = {};
+
+  try {
+    const result = await pool.query(
+      'SELECT id, date, time, booked FROM available_time_slots WHERE date >= $1 AND date <= $2 ORDER BY date, time',
+      [weekDays[0].date, weekDays[6].date]
+    );
+
+    for (const row of result.rows) {
+      if (!weeklySlots[row.date]) weeklySlots[row.date] = [];
+      weeklySlots[row.date].push({
+        id: row.id,
+        time: row.time,
+        available: !row.booked
+      });
+    }
+
+    res.render('index', { weekDays, timeLabels, weeklySlots });
+  } catch (err) {
+    console.error('❌ Error fetching weekly slots:', err);
+    res.status(500).send('Server error');
+  }
 });
 
 router.post('/book', async (req, res) => {
-  const { name, email, phone, date, slot_id } = req.body;
+  const { name, email, phone, slot_id } = req.body;
   console.log('🧾 Booking Request Body:', req.body);
 
   try {
@@ -38,6 +62,13 @@ router.post('/book', async (req, res) => {
       console.error('❌ Invalid time slot selected');
       return res.status(400).send('❌ Invalid time slot selected.');
     }
+
+    console.log('🔍 Fetching date for slot ID:', slot_id);
+    const dateResult = await pool.query(
+      'SELECT date FROM available_time_slots WHERE id = $1',
+      [slot_id]
+    );
+    const date = dateResult.rows[0]?.date;
 
     console.log('📥 Inserting booking...');
     await pool.query(
