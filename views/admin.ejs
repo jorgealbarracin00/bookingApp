@@ -27,14 +27,77 @@
 </head>
 <body>
   <h2>📅 Set Available Time Slots</h2>
-  <form action="/admin/save" method="POST">
-    <label>Select Date</label>
-    <input type="date" name="date" required>
+  <% if (typeof success !== 'undefined') { %>
+    <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+      ✅ Time slots saved successfully!
+    </div>
+  <% } %>
+  <% if (typeof error !== 'undefined') { %>
+    <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+      ❌ An error occurred while saving slots. Please try again.
+    </div>
+  <% } %>
+  <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+    <form method="GET" action="/admin/dashboard">
+      <input type="hidden" name="weekOffset" value="<%= currentOffset - 1 %>">
+      <button type="submit">← Previous Week</button>
+    </form>
+    <form method="GET" action="/admin/dashboard">
+      <input type="hidden" name="weekOffset" value="<%= currentOffset + 1 %>">
+      <button type="submit">Next Week →</button>
+    </form>
+  </div>
 
-    <label>Time Slots (comma separated)</label>
-    <textarea name="times" rows="4" placeholder="e.g. 09:00 AM, 10:30 AM, 2:00 PM" required></textarea>
+  <form action="/admin/save" method="POST" id="slotForm">
+    <input type="hidden" name="weekOffset" value="<%= currentOffset %>">
+    <div style="overflow-x: auto;">
+      <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <% weekDays.forEach(day => { %>
+              <th>
+                <%= day.label %><br><%= day.date %>
+                <br><input type="checkbox" onclick="toggleDay('<%= day.date %>', this)">
+              </th>
+            <% }); %>
+          </tr>
+        </thead>
+        <tbody>
+          <% timeLabels.forEach(time => { %>
+            <tr>
+              <td><%= time %></td>
+              <% weekDays.forEach(day => { 
+                  const checked = slotMap[day.date]?.[time];
+              %>
+                <td style="text-align: center;">
+                  <input type="checkbox" name="slots" value="<%= day.date %>_<%= time %>" class="slotBox <%= day.date %>" <%= checked ? "checked" : "" %> />
+                </td>
+              <% }); %>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
 
-    <button type="submit">Save Slots</button>
+    <div style="margin-top: 10px;">
+      <button type="button" onclick="toggleAll(true)">✔️ Select All</button>
+      <button type="button" onclick="toggleAll(false)">❌ Clear All</button>
+      <button type="submit">💾 Save Slots</button>
+    </div>
   </form>
+
+  <script>
+    function toggleDay(day, source) {
+      document.querySelectorAll('.' + day).forEach(cb => cb.checked = source.checked);
+    }
+
+    function toggleAll(value) {
+      document.querySelectorAll('.slotBox').forEach(cb => cb.checked = value);
+    }
+    setTimeout(() => {
+      document.querySelectorAll('div[style*="background"]').forEach(el => el.remove());
+    }, 4000);
+  </script>
 </body>
 </html>
