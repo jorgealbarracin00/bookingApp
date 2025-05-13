@@ -136,7 +136,10 @@
           </tr>
         </thead>
         <tbody>
-          <% timeLabels.forEach((label, rowIndex) => { %>
+          <% timeLabels.filter(label => {
+               const hour = parseInt(label.split(':')[0], 10);
+               return hour >= 9 && hour < 17;
+             }).forEach((label, rowIndex) => { %>
             <tr>
               <td style="padding: 6px; text-align: center; font-weight: bold; color: #444;"><%= label %></td>
               <% weekDays.forEach(day => {
@@ -160,6 +163,12 @@
           <% }); %>
         </tbody>
       </table>
+    <div style="margin-top: 10px; font-size: 14px; text-align: center;">
+      <span style="display: inline-block; width: 16px; height: 16px; background-color: #00ff90; border-radius: 4px; margin-right: 6px;"></span>
+      Available
+      <span style="display: inline-block; width: 16px; height: 16px; background-color: #ff4d4d; border-radius: 4px; margin-left: 20px; margin-right: 6px;"></span>
+      Unavailable
+    </div>
     </div>
   </div>
 <script>
@@ -174,9 +183,24 @@
         const email = document.querySelector('input[name="email"]').value.trim();
         const phone = document.querySelector('input[name="phone"]').value.trim();
 
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phonePattern = /^[0-9\-\+\s\(\)]{7,15}$/;
+
         if (!name || !email || !phone) {
           e.preventDefault();
           alert("Please fill in your name, email, and phone number before booking.");
+          return;
+        }
+
+        if (!emailPattern.test(email)) {
+          e.preventDefault();
+          alert("Please enter a valid email address.");
+          return;
+        }
+
+        if (!phonePattern.test(phone)) {
+          e.preventDefault();
+          alert("Please enter a valid phone number.");
           return;
         }
 
