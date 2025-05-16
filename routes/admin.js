@@ -54,13 +54,24 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
 
   let slotMap = {};
   try {
-    const result = await pool.query(
+    // Fetch available slots
+    const availableResult = await pool.query(
       'SELECT date, time FROM available_time_slots WHERE date >= $1 AND date <= $2',
       [weekDays[0].date, weekDays[6].date]
     );
-    result.rows.forEach(row => {
+    availableResult.rows.forEach(row => {
       if (!slotMap[row.date]) slotMap[row.date] = {};
-      slotMap[row.date][row.time] = true;
+      slotMap[row.date][row.time] = "available";
+    });
+
+    // Fetch booked slots
+    const bookedResult = await pool.query(
+      'SELECT date, time FROM bookings WHERE date >= $1 AND date <= $2',
+      [weekDays[0].date, weekDays[6].date]
+    );
+    bookedResult.rows.forEach(row => {
+      if (!slotMap[row.date]) slotMap[row.date] = {};
+      slotMap[row.date][row.time] = "booked";
     });
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
@@ -76,19 +87,9 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   });
 });
 
-// Updated /save route for graphical weekly slot saving
+// Updated /save route for graphical weekly slot saving with new input format
 router.post('/save', verifyFirebaseToken, async (req, res) => {
-  const selected = req.body.slots || [];
   const weekOffset = parseInt(req.body.weekOffset || 0);
-  const slots = Array.isArray(selected) ? selected : [selected];
-
-  // Parse selected slots into date/time pairs
-  const selectedMap = {};
-  for (const slot of slots) {
-    const [date, time] = slot.split('_');
-    if (!selectedMap[date]) selectedMap[date] = new Set();
-    selectedMap[date].add(time);
-  }
 
   const start = new Date();
   start.setDate(start.getDate() - start.getDay() + 1 + weekOffset * 7);
@@ -100,17 +101,29 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
   }
 
   try {
+    // Clear existing available slots for the week
     await pool.query(
       'DELETE FROM available_time_slots WHERE date = ANY($1::date[])',
       [weekDates]
     );
 
-    for (const date in selectedMap) {
-      for (const time of selectedMap[date]) {
-        await pool.query(
-          'INSERT INTO available_time_slots (date, time, booked) VALUES ($1, $2, false)',
-          [date, time]
-        );
+    // Parse slots from req.body keys starting with "slots_"
+    for (const key in req.body) {
+      if (key.startsWith('slots_')) {
+        const value = req.body[key];
+        if (value !== 'available') {
+          // Skip unavailable slots
+          continue;
+        }
+        // key format: slots_YYYY-MM-DD_HH:MM
+        const slotPart = key.slice(6);
+        const [date, time] = slotPart.split('_');
+        if (date && time) {
+          await pool.query(
+            'INSERT INTO available_time_slots (date, time, booked) VALUES ($1, $2, false)',
+            [date, time]
+          );
+        }
       }
     }
 

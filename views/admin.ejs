@@ -56,7 +56,7 @@
           <tr>
             <th>Time</th>
             <% weekDays.forEach(day => { %>
-              <th>
+              <th style="<%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                 <%= day.label %><br><%= day.date %>
                 <br><input type="checkbox" onclick="toggleDay('<%= day.date %>', this)">
               </th>
@@ -70,7 +70,7 @@
               <% weekDays.forEach(day => { 
                   const checked = slotMap[day.date]?.[time];
               %>
-                <td style="text-align: center;">
+                <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                   <input type="checkbox" name="slots" value="<%= day.date %>_<%= time %>" class="slotBox <%= day.date %>" <%= checked ? "checked" : "" %> />
                 </td>
               <% }); %>
