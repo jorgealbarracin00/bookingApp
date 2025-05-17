@@ -1,7 +1,7 @@
 <%
   const filteredWeekDays = weekDays.filter(day => {
-    const label = day.label.toLowerCase().trim();
-    return label !== "saturday" && label !== "sunday";
+    const dayIndex = new Date(day.date).getDay();
+    return dayIndex >= 1 && dayIndex <= 5; // Monday to Friday
   });
 %>
 <!DOCTYPE html>
