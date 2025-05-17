@@ -10,6 +10,8 @@
       padding: 60px 0;
     }
     .container {
+      max-width: 960px;
+      margin: 0 auto;
       width: 95%;
     }
     input, textarea, button {
@@ -42,7 +44,7 @@
         ❌ An error occurred while saving slots. Please try again.
       </div>
     <% } %>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; max-width: 960px; margin: 0 auto 10px auto;">
       <form method="GET" action="/admin/dashboard">
         <input type="hidden" name="weekOffset" value="<%= currentOffset - 1 %>">
         <button type="submit">← Previous Week</button>

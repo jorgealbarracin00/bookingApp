@@ -53,6 +53,14 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   }
 
   let slotMap = {};
+
+  weekDays.forEach(day => {
+    slotMap[day.date] = {};
+    timeLabels.forEach(time => {
+      slotMap[day.date][time] = "unavailable"; // default
+    });
+  });
+
   try {
     // Fetch available slots
     const availableResult = await pool.query(
@@ -62,6 +70,8 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     availableResult.rows.forEach(row => {
       if (!slotMap[row.date]) slotMap[row.date] = {};
       if (!slotMap[row.date][row.time]) {
+        slotMap[row.date][row.time] = "available";
+      } else {
         slotMap[row.date][row.time] = "available";
       }
     });
