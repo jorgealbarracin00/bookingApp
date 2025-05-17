@@ -68,7 +68,7 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
       [weekDays[0].date, weekDays[6].date]
     );
     availableResult.rows.forEach(row => {
-      console.log('Available slot raw time:', row.time);
+      // console.log('Available slot raw time:', row.time);
       const cleanDate = new Date(row.date).toISOString().split('T')[0];
       if (!slotMap[cleanDate]) slotMap[cleanDate] = {};
       const cleanTime = row.time.slice(0, 5).trim();
@@ -81,17 +81,18 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
       [weekDays[0].date, weekDays[6].date]
     );
     bookedResult.rows.forEach(row => {
-      console.log('Booked slot raw time:', row.time);
+      // console.log('Booked slot raw time:', row.time);
       const cleanDate = new Date(row.date).toISOString().split('T')[0];
       if (!slotMap[cleanDate]) slotMap[cleanDate] = {};
       const cleanTime = row.time.slice(0, 5).trim();
+      // booked overrides available
       slotMap[cleanDate][cleanTime] = "booked";
     });
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
   }
 
-  console.log('Final slotMap sample (Mon):', JSON.stringify(slotMap[weekDays[0].date], null, 2));
+  console.log('slotMap after fetching slots:', JSON.stringify(slotMap, null, 2));
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -106,29 +107,6 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   });
 });
 
-// Added route to enable delete booking button to work again
-router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
-  const { deleteBooking, weekOffset } = req.body;
-  const [date, time] = deleteBooking.split('_');
-
-  try {
-    // Delete from bookings
-    await pool.query('DELETE FROM bookings WHERE date = $1 AND time = $2', [date, time]);
-
-    // Set slot as available
-    await pool.query(
-      `INSERT INTO available_time_slots (date, time, booked)
-       VALUES ($1, $2, false)
-       ON CONFLICT (date, time) DO UPDATE SET booked = false`,
-      [date, time]
-    );
-
-    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&success=1`);
-  } catch (err) {
-    console.error('❌ Error deleting slot:', err);
-    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&error=1`);
-  }
-});
 
 // Updated /save route for graphical weekly slot saving with new input format
 router.post('/save', verifyFirebaseToken, async (req, res) => {
