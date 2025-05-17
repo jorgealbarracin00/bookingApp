@@ -153,4 +153,26 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
   }
 });
 
+router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
+  const { date, time, weekOffset } = req.body;
+
+  try {
+    // Delete from bookings
+    await pool.query('DELETE FROM bookings WHERE date = $1 AND time = $2', [date, time]);
+
+    // Set slot as available
+    await pool.query(
+      `INSERT INTO available_time_slots (date, time, booked)
+       VALUES ($1, $2, false)
+       ON CONFLICT (date, time) DO UPDATE SET booked = false`,
+      [date, time]
+    );
+
+    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&success=1`);
+  } catch (err) {
+    console.error('❌ Error deleting slot:', err);
+    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&error=1`);
+  }
+});
+
 module.exports = router;
