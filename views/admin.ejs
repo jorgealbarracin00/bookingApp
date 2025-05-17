@@ -197,39 +197,36 @@
         document.querySelectorAll('div[style*="background"]:not([style*="#ffe5e5"])').forEach(el => el.remove());
       }, 4000);
 
-      const deleteForms = document.querySelectorAll('form[action="/admin/delete-slot"]');
-      deleteForms.forEach(form => {
-        form.addEventListener('submit', (e) => {
-          const td = form.closest('td');
-          const dateInput = form.querySelector('input[name="date"]');
-          const timeInput = form.querySelector('input[name="time"]');
-          const date = dateInput ? dateInput.value : '';
-          const time = timeInput ? timeInput.value : '';
-          if (td && date && time) {
-            td.innerHTML = `
-              <button type="button" class="slot-toggle" data-date="${date}" data-time="${time}" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
-              <input type="hidden" name="slots_${date}_${time}" value="unavailable">
-            `;
+      document.addEventListener('DOMContentLoaded', function() {
+        const deleteForms = document.querySelectorAll('form[action="/admin/delete-slot"]');
+        deleteForms.forEach(form => {
+          form.addEventListener('submit', function () {
+            const td = form.closest('td');
+            const date = form.querySelector('input[name="date"]').value;
+            const time = form.querySelector('input[name="time"]').value;
 
-            const newButton = td.querySelector('.slot-toggle');
-            const hiddenInput = td.querySelector('input[type="hidden"]');
-            if (newButton && hiddenInput) {
-              newButton.addEventListener('click', () => {
-                let newStatus;
-                if (newButton.dataset.status === 'available') {
-                  newStatus = 'unavailable';
-                  newButton.style.backgroundColor = '#f44336';
-                  newButton.textContent = 'Unavailable';
-                } else {
-                  newStatus = 'available';
-                  newButton.style.backgroundColor = '#4CAF50';
-                  newButton.textContent = 'Available';
+            // Delay DOM update to ensure form submits
+            setTimeout(() => {
+              if (td) {
+                td.innerHTML = `
+                  <button type="button" class="slot-toggle" data-date="${date}" data-time="${time}" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
+                  <input type="hidden" name="slots_${date}_${time}" value="unavailable">
+                `;
+
+                const newButton = td.querySelector('.slot-toggle');
+                const hiddenInput = td.querySelector('input[type="hidden"]');
+                if (newButton && hiddenInput) {
+                  newButton.addEventListener('click', () => {
+                    const newStatus = newButton.dataset.status === 'available' ? 'unavailable' : 'available';
+                    newButton.style.backgroundColor = newStatus === 'available' ? '#4CAF50' : '#f44336';
+                    newButton.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    newButton.dataset.status = newStatus;
+                    hiddenInput.value = newStatus;
+                  });
                 }
-                newButton.dataset.status = newStatus;
-                hiddenInput.value = newStatus;
-              });
-            }
-          }
+              }
+            }, 500);
+          });
         });
       });
     </script>
