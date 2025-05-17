@@ -69,7 +69,8 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     );
     availableResult.rows.forEach(row => {
       if (!slotMap[row.date]) slotMap[row.date] = {};
-      slotMap[row.date][row.time] = "available";
+      const cleanTime = row.time.slice(0, 5);
+      slotMap[row.date][cleanTime] = "available";
     });
 
     // Fetch booked slots
@@ -79,7 +80,8 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     );
     bookedResult.rows.forEach(row => {
       if (!slotMap[row.date]) slotMap[row.date] = {};
-      slotMap[row.date][row.time] = "booked";
+      const cleanTime = row.time.slice(0, 5);
+      slotMap[row.date][cleanTime] = "booked";
     });
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
