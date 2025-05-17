@@ -101,7 +101,9 @@
                 %>
                   <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                     <% if (checked === "booked") { %>
-                      <span style="color: red; font-weight: bold;">Booked</span>
+                      <div style="background-color: #ffe5e5; padding: 6px; border-radius: 4px;">
+                        <strong style="color: red;">📌 Booked</strong>
+                      </div>
                       <br>
                       <form method="POST" action="/admin/delete-slot" style="margin-top: 4px;">
                         <input type="hidden" name="date" value="<%= day.date %>">
