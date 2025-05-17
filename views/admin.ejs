@@ -64,12 +64,14 @@
         <span style="margin-left: 10px; color: red;">Booked</span>
       </div>
       <div style="overflow-x: auto;">
+        <%
+          const filteredWeekDays = weekDays.filter(day => day.label !== "Saturday" && day.label !== "Sunday");
+        %>
         <table border="1" cellpadding="6" cellspacing="0">
           <thead>
             <tr>
               <th>Time</th>
-              <% weekDays.forEach(day => {
-                if (day.label === "Saturday" || day.label === "Sunday") return;
+              <% filteredWeekDays.forEach(day => {
               %>
                 <th style="<%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                   <%= day.label %><br><%= day.date %>
@@ -84,8 +86,7 @@
             %>
               <tr>
                 <td><%= time %></td>
-                <% weekDays.forEach(day => { 
-                    if (day.label === "Saturday" || day.label === "Sunday") return;
+                <% filteredWeekDays.forEach(day => { 
                     const checked = slotMap[day.date]?.[time];
                 %>
                   <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
