@@ -77,13 +77,16 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     console.error('Error fetching slots for admin view:', err);
   }
 
+  const today = new Date().toISOString().split('T')[0];
+
   res.render('admin', {
     weekDays,
     timeLabels,
     slotMap,
     currentOffset: offset,
     success: req.query.success,
-    error: req.query.error
+    error: req.query.error,
+    today
   });
 });
 

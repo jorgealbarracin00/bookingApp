@@ -50,6 +50,12 @@
 
   <form action="/admin/save" method="POST" id="slotForm">
     <input type="hidden" name="weekOffset" value="<%= currentOffset %>">
+    <div style="margin-bottom: 10px;">
+      <strong>Legend:</strong> 
+      <span style="margin-left: 10px; color: green;">Available</span>
+      <span style="margin-left: 10px;">Unavailable</span>
+      <span style="margin-left: 10px; color: red;">Booked</span>
+    </div>
     <div style="overflow-x: auto;">
       <table border="1" cellpadding="6" cellspacing="0">
         <thead>
@@ -71,7 +77,16 @@
                   const checked = slotMap[day.date]?.[time];
               %>
                 <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
-                  <input type="checkbox" name="slots" value="<%= day.date %>_<%= time %>" class="slotBox <%= day.date %>" <%= checked ? "checked" : "" %> />
+                  <% if (checked === "booked") { %>
+                    <span style="color: red; font-weight: bold;">Booked</span>
+                    <br>
+                    <button type="submit" name="deleteBooking" value="<%= day.date %>_<%= time %>" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                  <% } else { %>
+                    <select name="slots_<%= day.date %>_<%= time %>">
+                      <option value="unavailable" <%= checked === "unavailable" ? "selected" : "" %>>Unavailable</option>
+                      <option value="available" <%= checked === "available" ? "selected" : "" %>>Available</option>
+                    </select>
+                  <% } %>
                 </td>
               <% }); %>
             </tr>
@@ -81,8 +96,6 @@
     </div>
 
     <div style="margin-top: 10px;">
-      <button type="button" onclick="toggleAll(true)">✔️ Select All</button>
-      <button type="button" onclick="toggleAll(false)">❌ Clear All</button>
       <button type="submit">💾 Save Slots</button>
     </div>
   </form>
