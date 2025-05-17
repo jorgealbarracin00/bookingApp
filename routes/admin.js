@@ -68,6 +68,7 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
       [weekDays[0].date, weekDays[6].date]
     );
     availableResult.rows.forEach(row => {
+      console.log('Available slot raw time:', row.time);
       if (!slotMap[row.date]) slotMap[row.date] = {};
       const cleanTime = row.time.slice(0, 5);
       slotMap[row.date][cleanTime] = "available";
@@ -79,6 +80,7 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
       [weekDays[0].date, weekDays[6].date]
     );
     bookedResult.rows.forEach(row => {
+      console.log('Booked slot raw time:', row.time);
       if (!slotMap[row.date]) slotMap[row.date] = {};
       const cleanTime = row.time.slice(0, 5);
       slotMap[row.date][cleanTime] = "booked";
@@ -86,6 +88,8 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
   }
+
+  console.log('Final slotMap sample (Mon):', JSON.stringify(slotMap[weekDays[0].date], null, 2));
 
   const today = new Date().toISOString().split('T')[0];
 
