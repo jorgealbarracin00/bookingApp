@@ -85,10 +85,8 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
       const cleanDate = new Date(row.date).toISOString().split('T')[0];
       if (!slotMap[cleanDate]) slotMap[cleanDate] = {};
       const cleanTime = row.time.slice(0, 5).trim();
-      // Only set to "booked" if it is currently "available"
-      if (slotMap[cleanDate] && slotMap[cleanDate][cleanTime] === "available") {
-        slotMap[cleanDate][cleanTime] = "booked";
-      }
+      // Always set to "booked" if there is a booking, so bookings take precedence
+      slotMap[cleanDate][cleanTime] = "booked";
     });
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
