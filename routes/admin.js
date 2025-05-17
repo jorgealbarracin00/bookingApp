@@ -69,11 +69,7 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     );
     availableResult.rows.forEach(row => {
       if (!slotMap[row.date]) slotMap[row.date] = {};
-      if (!slotMap[row.date][row.time]) {
-        slotMap[row.date][row.time] = "available";
-      } else {
-        slotMap[row.date][row.time] = "available";
-      }
+      slotMap[row.date][row.time] = "available";
     });
 
     // Fetch booked slots
