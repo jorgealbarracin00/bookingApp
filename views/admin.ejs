@@ -180,7 +180,7 @@
       });
 
       setTimeout(() => {
-        document.querySelectorAll('div[style*="background"]').forEach(el => el.remove());
+        document.querySelectorAll('div[style*="background"]:not([style*="#ffe5e5"])').forEach(el => el.remove());
       }, 4000);
     </script>
   </div>
