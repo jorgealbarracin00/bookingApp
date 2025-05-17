@@ -170,6 +170,8 @@ router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
       [date, time]
     );
 
+    console.log(`Deleted booking for ${date} ${time} and set as available.`);
+
     res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&success=1`);
   } catch (err) {
     console.error('❌ Error deleting slot:', err);
