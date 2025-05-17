@@ -5,7 +5,8 @@
   <style>
     body {
       font-family: sans-serif;
-      max-width: 500px;
+      max-width: none;
+      width: 95%;
       margin: 60px auto;
     }
     input, textarea, button {
@@ -51,37 +52,30 @@
   <form action="/admin/save" method="POST" id="slotForm">
     <input type="hidden" name="weekOffset" value="<%= currentOffset %>">
     <div style="margin-bottom: 10px;">
-      <strong>Legend:</strong>
-      <span style="margin-left: 10px; color: white; background-color: #4CAF50; padding: 2px 8px; border-radius: 4px;">Available</span>
-      <span style="margin-left: 10px; color: white; background-color: #f44336; padding: 2px 8px; border-radius: 4px;">Unavailable</span>
-      <span style="margin-left: 10px; color: white; background-color: #ff9800; padding: 2px 8px; border-radius: 4px;">Booked</span>
+      <strong>Legend:</strong> 
+      <span style="margin-left: 10px; color: green;">Available</span>
+      <span style="margin-left: 10px;">Unavailable</span>
+      <span style="margin-left: 10px; color: red;">Booked</span>
     </div>
     <div style="overflow-x: auto;">
       <table border="1" cellpadding="6" cellspacing="0">
         <thead>
           <tr>
             <th>Time</th>
-            <% weekDays.forEach(day => { 
-              const dayOfWeek = new Date(day.date).getDay();
-              if (dayOfWeek === 0 || dayOfWeek === 6) return;
-            %>
+            <% weekDays.forEach(day => { %>
               <th style="<%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                 <%= day.label %><br><%= day.date %>
-                <br><input type="checkbox" onclick="toggleDay('<%= day.date %>', this)">
+                <br><input type="checkbox" class="select-day-checkbox" data-date="<%= day.date %>">
               </th>
             <% }); %>
           </tr>
         </thead>
         <tbody>
-          <% timeLabels.forEach(time => { 
-            if (time > "17:00") return;
-          %>
+          <% timeLabels.forEach(time => { %>
             <tr>
               <td><%= time %></td>
               <% weekDays.forEach(day => { 
-                const dayOfWeek = new Date(day.date).getDay();
-                if (dayOfWeek === 0 || dayOfWeek === 6) return;
-                const checked = slotMap[day.date]?.[time];
+                  const checked = slotMap[day.date]?.[time];
               %>
                 <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                   <% if (checked === "booked") { %>
@@ -89,9 +83,10 @@
                     <br>
                     <button type="submit" name="deleteBooking" value="<%= day.date %>_<%= time %>" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
                   <% } else { %>
-                    <button type="submit" name="slots_<%= day.date %>_<%= time %>" value="<%= checked === 'available' ? 'unavailable' : 'available' %>" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: <%= checked === 'booked' ? '#ff9800' : checked === 'available' ? '#4CAF50' : '#f44336' %>; color: white;" <%= checked === 'booked' ? 'disabled' : '' %>>
-                      <%= checked === 'booked' ? 'Booked' : checked === 'available' ? 'Available' : 'Unavailable' %>
+                    <button type="button" class="slot-toggle" data-date="<%= day.date %>" data-time="<%= time %>" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: <%= checked === 'available' ? '#4CAF50' : '#f44336' %>; color: white;" data-status="<%= checked %>">
+                      <%= checked === 'available' ? 'Available' : 'Unavailable' %>
                     </button>
+                    <input type="hidden" name="slots_<%= day.date %>_<%= time %>" value="<%= checked %>">
                   <% } %>
                 </td>
               <% }); %>
@@ -107,15 +102,53 @@
   </form>
 
   <script>
-    function toggleDay(day, source) {
-      document.querySelectorAll('input.slotBox.' + CSS.escape(day)).forEach(cb => {
-        cb.checked = source.checked;
+    // Slot toggle logic
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle individual slot button
+      document.querySelectorAll('.slot-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const hiddenInput = btn.parentElement.querySelector('input[type="hidden"][name="slots_' + btn.dataset.date + '_' + btn.dataset.time + '"]');
+          let newStatus;
+          if (btn.dataset.status === 'available') {
+            newStatus = 'unavailable';
+            btn.style.backgroundColor = '#f44336';
+            btn.textContent = 'Unavailable';
+          } else {
+            newStatus = 'available';
+            btn.style.backgroundColor = '#4CAF50';
+            btn.textContent = 'Available';
+          }
+          btn.dataset.status = newStatus;
+          if (hiddenInput) hiddenInput.value = newStatus;
+        });
       });
-    }
 
-    function toggleAll(value) {
-      document.querySelectorAll('.slotBox').forEach(cb => cb.checked = value);
-    }
+      // "Select whole day" logic
+      document.querySelectorAll('.select-day-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+          const date = checkbox.getAttribute('data-date');
+          const buttons = document.querySelectorAll('.slot-toggle[data-date="' + date + '"]');
+          buttons.forEach(function(btn) {
+            // Only toggle if not booked (button exists)
+            const hiddenInput = btn.parentElement.querySelector('input[type="hidden"][name="slots_' + btn.dataset.date + '_' + btn.dataset.time + '"]');
+            if (!hiddenInput) return;
+            let newStatus;
+            if (checkbox.checked) {
+              newStatus = 'available';
+              btn.style.backgroundColor = '#4CAF50';
+              btn.textContent = 'Available';
+            } else {
+              newStatus = 'unavailable';
+              btn.style.backgroundColor = '#f44336';
+              btn.textContent = 'Unavailable';
+            }
+            btn.dataset.status = newStatus;
+            hiddenInput.value = newStatus;
+          });
+        });
+      });
+    });
+
     setTimeout(() => {
       document.querySelectorAll('div[style*="background"]').forEach(el => el.remove());
     }, 4000);
