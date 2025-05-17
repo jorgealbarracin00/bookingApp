@@ -219,6 +219,10 @@
         const confirmed = confirm(`Confirm your booking with the following info:\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}`);
         if (!confirmed) {
           e.preventDefault();
+        } else {
+          document.querySelector('input[name="name"]').value = '';
+          document.querySelector('input[name="email"]').value = '';
+          document.querySelector('input[name="phone"]').value = '';
         }
       });
     });
