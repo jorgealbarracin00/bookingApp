@@ -68,7 +68,9 @@
           <thead>
             <tr>
               <th>Time</th>
-              <% weekDays.forEach(day => { %>
+              <% weekDays.forEach(day => {
+                if (day.label === "Saturday" || day.label === "Sunday") return;
+              %>
                 <th style="<%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
                   <%= day.label %><br><%= day.date %>
                   <br><input type="checkbox" class="select-day-checkbox" data-date="<%= day.date %>">
@@ -77,10 +79,13 @@
             </tr>
           </thead>
           <tbody>
-            <% timeLabels.forEach(time => { %>
+            <% timeLabels.forEach(time => {
+              if (time > "17:00") return;
+            %>
               <tr>
                 <td><%= time %></td>
                 <% weekDays.forEach(day => { 
+                    if (day.label === "Saturday" || day.label === "Sunday") return;
                     const checked = slotMap[day.date]?.[time];
                 %>
                   <td style="text-align: center; <%= day.date === today ? 'background-color: #e0f7fa;' : '' %>">
