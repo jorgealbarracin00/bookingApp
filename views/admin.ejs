@@ -34,7 +34,10 @@
 <body>
   <div class="container">
     <%
-      const filteredWeekDays = weekDays.filter(day => day.label !== "Saturday" && day.label !== "Sunday");
+      const filteredWeekDays = weekDays.filter(day => {
+        const label = day.label.toLowerCase().trim();
+        return label !== "saturday" && label !== "sunday";
+      });
     %>
     <h2>📅 Set Available Time Slots</h2>
     <% if (success) { %>
