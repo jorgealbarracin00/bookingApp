@@ -1,3 +1,9 @@
+<%
+  const filteredWeekDays = weekDays.filter(day => {
+    const label = day.label.toLowerCase().trim();
+    return label !== "saturday" && label !== "sunday";
+  });
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,12 +39,6 @@
 </head>
 <body>
   <div class="container">
-    <%
-      const filteredWeekDays = weekDays.filter(day => {
-        const label = day.label.toLowerCase().trim();
-        return label !== "saturday" && label !== "sunday";
-      });
-    %>
     <h2>📅 Set Available Time Slots</h2>
     <% if (success) { %>
       <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
