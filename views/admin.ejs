@@ -201,10 +201,15 @@
       deleteForms.forEach(form => {
         form.addEventListener('submit', (e) => {
           const td = form.closest('td');
-          if (td) {
-            // Replace form with slot button
-            td.innerHTML = `<button type="button" class="slot-toggle" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
-            <input type="hidden" name="slots_${form.date}_${form.time}" value="unavailable">`;
+          const dateInput = form.querySelector('input[name="date"]');
+          const timeInput = form.querySelector('input[name="time"]');
+          const date = dateInput ? dateInput.value : '';
+          const time = timeInput ? timeInput.value : '';
+          if (td && date && time) {
+            td.innerHTML = `
+              <button type="button" class="slot-toggle" data-date="${date}" data-time="${time}" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
+              <input type="hidden" name="slots_${date}_${time}" value="unavailable">
+            `;
           }
         });
       });
