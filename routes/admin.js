@@ -159,6 +159,13 @@ router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
   const { date, time, weekOffset } = req.body;
 
   try {
+    // Add console log for debugging
+    console.log('Trying to delete:', date, time);
+
+    // Check if booking exists before deletion
+    const bookingCheck = await pool.query('SELECT * FROM bookings WHERE date = $1 AND time = $2', [date, time]);
+    console.log('Booking found:', bookingCheck.rows.length > 0);
+
     // Delete from bookings
     await pool.query('DELETE FROM bookings WHERE date = $1 AND time = $2', [date, time]);
 
