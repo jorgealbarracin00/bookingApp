@@ -105,13 +105,13 @@
                         <strong style="color: red;">📌 Booked</strong>
                       </div>
                       <br>
-                      <form method="POST" action="/admin/delete-slot" style="margin-top: 4px;">
-                        <input type="hidden" name="date" value="<%= day.date %>">
-                        <input type="hidden" name="time" value="<%= time %>">
-                        <input type="hidden" name="weekOffset" value="<%= currentOffset %>">
-                        <input type="hidden" name="slots_<%= day.date %>_<%= time %>" value="unavailable">
-                        <button type="submit" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
-                      </form>
+                      <button 
+                        class="delete-slot-btn" 
+                        data-date="<%= day.date %>" 
+                        data-time="<%= time %>" 
+                        style="width: 100%; padding: 6px; border-radius: 4px; background-color: #d9534f; color: white; border: none;">
+                        Delete
+                      </button>
                     <% } else { %>
                       <button type="button" class="slot-toggle" data-date="<%= day.date %>" data-time="<%= time %>" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: <%= checked === 'available' ? '#4CAF50' : '#f44336' %>; color: white;" data-status="<%= checked %>">
                         <%= checked === 'available' ? 'Available' : 'Unavailable' %>
@@ -183,53 +183,52 @@
         document.querySelectorAll('div[style*="background"]:not([style*="#ffe5e5"])').forEach(el => el.remove());
       }, 4000);
 
-      document.addEventListener('DOMContentLoaded', function() {
-        const deleteForms = document.querySelectorAll('form[action="/admin/delete-slot"]');
-        deleteForms.forEach(form => {
-          form.addEventListener('submit', function () {
-            const td = form.closest('td');
-            const date = form.querySelector('input[name="date"]').value;
-            const time = form.querySelector('input[name="time"]').value;
+      // AJAX delete slot logic for booked slots
+      document.querySelectorAll('.delete-slot-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm("Are you sure you want to delete this booking?")) return;
 
-            // Delay DOM update to ensure form submits
-            setTimeout(() => {
-              if (td) {
-                td.innerHTML = `
-                  <button type="button" class="slot-toggle" data-date="${date}" data-time="${time}" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
-                  <input type="hidden" name="slots_${date}_${time}" value="unavailable">
-                `;
+          const date = btn.getAttribute('data-date');
+          const time = btn.getAttribute('data-time');
 
-                const newButton = td.querySelector('.slot-toggle');
-                const hiddenInput = td.querySelector('input[type="hidden"]');
-                if (newButton && hiddenInput) {
-                  newButton.addEventListener('click', () => {
-                    const newStatus = newButton.dataset.status === 'available' ? 'unavailable' : 'available';
-                    newButton.style.backgroundColor = newStatus === 'available' ? '#4CAF50' : '#f44336';
-                    newButton.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-                    newButton.dataset.status = newStatus;
-                    hiddenInput.value = newStatus;
-                  });
-                }
-              }
-            }, 500);
-          });
+          try {
+            const response = await fetch('/admin/delete-slot', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ date, time })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              const td = btn.closest('td');
+              td.innerHTML = `
+                <button type="button" class="slot-toggle" data-date="${date}" data-time="${time}" style="width: 100%; padding: 6px; border: none; border-radius: 4px; background-color: #f44336; color: white;" data-status="unavailable">Unavailable</button>
+                <input type="hidden" name="slots_${date}_${time}" value="unavailable">
+              `;
+
+              const newBtn = td.querySelector('.slot-toggle');
+              const hidden = td.querySelector('input[type="hidden"]');
+              newBtn.addEventListener('click', () => {
+                const newStatus = newBtn.dataset.status === 'available' ? 'unavailable' : 'available';
+                newBtn.style.backgroundColor = newStatus === 'available' ? '#4CAF50' : '#f44336';
+                newBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                newBtn.dataset.status = newStatus;
+                hidden.value = newStatus;
+              });
+            } else {
+              alert(result.message || 'Error deleting slot.');
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Network error while deleting the slot.');
+          }
         });
       });
     </script>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const deleteForms = document.querySelectorAll('form[action="/admin/delete-slot"]');
-      deleteForms.forEach(form => {
-        form.addEventListener('submit', () => {
-          const btn = form.querySelector('button[type="submit"]');
-          if (btn) {
-            btn.disabled = true;
-            btn.textContent = "Deleting...";
-          }
-        });
-      });
-    });
-  </script>
+  <!-- AJAX delete-slot logic moved above -->
 </body>
 </html>
