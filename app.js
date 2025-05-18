@@ -27,6 +27,25 @@ app.use('/admin', queryTool);
 const adminRoutes = require('./routes/admin');
 app.use('/admin', adminRoutes);
 
+app.post('/admin/delete-slot', async (req, res) => {
+  try {
+    const { date, time } = req.body;
+    if (!date || !time) {
+      return res.status(400).json({ message: 'Missing date or time' });
+    }
+
+    await pool.query(
+      'UPDATE time_slots_v2 SET booked = false WHERE date = $1 AND time = $2',
+      [date, time]
+    );
+
+    res.status(200).json({ message: 'Slot marked as unavailable' });
+  } catch (err) {
+    console.error('Error deleting slot:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
