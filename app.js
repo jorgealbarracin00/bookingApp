@@ -1,6 +1,26 @@
 const express = require('express');
 const app = express(); // ✅ Move this to the top
 
+const pool = require('./db');
+
+async function addUniqueConstraint() {
+  try {
+    await pool.query(`
+      ALTER TABLE time_slots_v2
+      ADD CONSTRAINT unique_date_time UNIQUE (date, time);
+    `);
+    console.log("✅ UNIQUE constraint added to time_slots_v2.");
+  } catch (err) {
+    if (err.message.includes('already exists')) {
+      console.log("⚠️ UNIQUE constraint already exists, skipping...");
+    } else {
+      console.error("❌ Failed to add UNIQUE constraint:", err);
+    }
+  }
+}
+
+addUniqueConstraint();
+
 if (process.env.RUN_DB_SETUP === 'true') {
   const runQuery = require('./scripts/runQuery');
   runQuery().then(() => process.exit());
