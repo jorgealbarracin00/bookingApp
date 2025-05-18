@@ -157,14 +157,12 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
 
 router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
   console.log('DELETE-SLOT req.body:', req.body);
-  const date = req.body?.date;
-  const time = req.body?.time;
-  const weekOffset = req.body?.weekOffset;
-  const offset = parseInt(weekOffset || 0);
+  const { date, time, weekOffset } = req.body || {};
   if (!date || !time) {
-    console.error('❌ Missing date or time in request body');
+    console.error('❌ Missing date or time in request body:', req.body);
     return res.status(400).send('Missing date or time');
   }
+  const offset = parseInt(weekOffset || 0);
 
   try {
     // Add console log for debugging
