@@ -156,7 +156,8 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
 });
 
 router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
-  const { date, time, weekOffset } = req.body;
+  const { date, time } = req.body;
+  const weekOffset = parseInt(req.body.weekOffset || 0);
 
   try {
     // Add console log for debugging
