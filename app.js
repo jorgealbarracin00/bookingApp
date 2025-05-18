@@ -7,7 +7,7 @@ async function addUniqueConstraint() {
   try {
     await pool.query(`
       ALTER TABLE time_slots_v2
-      ADD CONSTRAINT unique_date_time UNIQUE (date, time);
+      ADD CONSTRAINT unique_date_time_v2 UNIQUE (date, time);
     `);
     console.log("✅ UNIQUE constraint added to time_slots_v2.");
   } catch (err) {
