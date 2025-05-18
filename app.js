@@ -21,12 +21,6 @@ async function addUniqueConstraint() {
 
 addUniqueConstraint();
 
-if (process.env.RUN_DB_SETUP === 'true') {
-  const runQuery = require('./scripts/runQuery');
-  runQuery().then(() => process.exit());
-  return;
-}
-
 app.use('/assets', express.static('assets'));
 
 const bodyParser = require('body-parser');

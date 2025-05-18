@@ -64,7 +64,7 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   try {
     // Fetch available slots
     const availableResult = await pool.query(
-      'SELECT date, time FROM available_time_slots WHERE date >= $1 AND date <= $2',
+      'SELECT date, time FROM time_slots_v2 WHERE date >= $1 AND date <= $2',
       [weekDays[0].date, weekDays[6].date]
     );
     availableResult.rows.forEach(row => {
@@ -124,7 +124,7 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
   try {
     // Clear existing available slots for the week
     await pool.query(
-      'DELETE FROM available_time_slots WHERE date = ANY($1::date[])',
+      'DELETE FROM time_slots_v2 WHERE date = ANY($1::date[])',
       [weekDates]
     );
 
@@ -141,7 +141,7 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
         const [date, time] = slotPart.split('_');
         if (date && time) {
           await pool.query(
-            'INSERT INTO available_time_slots (date, time, booked) VALUES ($1, $2, false)',
+            'INSERT INTO time_slots_v2 (date, time, booked) VALUES ($1, $2, false)',
             [date, time]
           );
         }
@@ -171,7 +171,7 @@ router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
 
     // Set slot as available
     await pool.query(
-      `INSERT INTO available_time_slots (date, time, booked)
+      `INSERT INTO time_slots_v2 (date, time, booked)
        VALUES ($1, $2, false)
        ON CONFLICT (date, time) DO UPDATE SET booked = false`,
       [date, time]

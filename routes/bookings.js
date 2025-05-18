@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, date, to_char(time::time, 'HH24:MI') AS time, booked
-       FROM available_time_slots
+       FROM time_slots_v2
        WHERE date >= $1 AND date <= $2
        ORDER BY date, time`,
       [weekDays[0].date, weekDays[6].date]
@@ -80,7 +80,7 @@ router.post('/book', async (req, res) => {
   try {
     console.log('🔍 Fetching time for slot ID:', slot_id);
     const timeResult = await pool.query(
-      'SELECT time FROM available_time_slots WHERE id = $1',
+      'SELECT time FROM time_slots_v2 WHERE id = $1',
       [slot_id]
     );
 
@@ -93,7 +93,7 @@ router.post('/book', async (req, res) => {
 
     console.log('🔍 Fetching date for slot ID:', slot_id);
     const dateResult = await pool.query(
-      'SELECT date FROM available_time_slots WHERE id = $1',
+      'SELECT date FROM time_slots_v2 WHERE id = $1',
       [slot_id]
     );
     const date = dateResult.rows[0]?.date;
@@ -107,7 +107,7 @@ router.post('/book', async (req, res) => {
 
     console.log('📦 Updating time slot to booked...');
     await pool.query(
-      'UPDATE available_time_slots SET booked = true WHERE id = $1',
+      'UPDATE time_slots_v2 SET booked = true WHERE id = $1',
       [slot_id]
     );
     console.log('✅ Slot updated');
