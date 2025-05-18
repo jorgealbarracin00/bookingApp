@@ -55,9 +55,11 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
   let slotMap = {};
 
   weekDays.forEach(day => {
-    slotMap[day.date] = {};
+    const dateKey = day.date;
+    slotMap[dateKey] = {};
+
     timeLabels.forEach(time => {
-      slotMap[day.date][time] = "unavailable"; // default
+      slotMap[dateKey][time] = "unavailable";
     });
   });
 
@@ -70,9 +72,10 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     availableResult.rows.forEach(row => {
       // console.log('Available slot raw time:', row.time);
       const cleanDate = new Date(row.date).toISOString().split('T')[0];
-      if (!slotMap[cleanDate]) slotMap[cleanDate] = {};
-      const cleanTime = row.time.slice(0, 5).trim();
-      slotMap[cleanDate][cleanTime] = "available";
+      const cleanTime = row.time.toString().slice(0, 5).trim();
+      if (slotMap[cleanDate] && slotMap[cleanDate][cleanTime] !== undefined) {
+        slotMap[cleanDate][cleanTime] = "available";
+      }
     });
 
     // Fetch booked slots
@@ -83,10 +86,11 @@ router.get('/dashboard', verifyFirebaseToken, async (req, res) => {
     bookedResult.rows.forEach(row => {
       // console.log('Booked slot raw time:', row.time);
       const cleanDate = new Date(row.date).toISOString().split('T')[0];
-      if (!slotMap[cleanDate]) slotMap[cleanDate] = {};
-      const cleanTime = row.time.slice(0, 5).trim();
-      // Always set to "booked" if there is a booking, so bookings take precedence
-      slotMap[cleanDate][cleanTime] = "booked";
+      const cleanTime = row.time.toString().slice(0, 5).trim();
+      if (slotMap[cleanDate] && slotMap[cleanDate][cleanTime] !== undefined) {
+        // Always set to "booked" if there is a booking, so bookings take precedence
+        slotMap[cleanDate][cleanTime] = "booked";
+      }
     });
   } catch (err) {
     console.error('Error fetching slots for admin view:', err);
