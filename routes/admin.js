@@ -156,9 +156,8 @@ router.post('/save', verifyFirebaseToken, async (req, res) => {
 });
 
 router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
-  const date = req.body?.date;
-  const time = req.body?.time;
-  const weekOffset = parseInt(req.body?.weekOffset || 0);
+  const { date, time, weekOffset } = req.body || {};
+  const offset = parseInt(weekOffset || 0);
   if (!date || !time) {
     console.error('❌ Missing date or time in request body');
     return res.status(400).send('Missing date or time');
@@ -185,10 +184,10 @@ router.post('/delete-slot', verifyFirebaseToken, async (req, res) => {
 
     console.log(`Deleted booking for ${date} ${time} and set as available.`);
 
-    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&success=1`);
+    res.redirect(`/admin/dashboard?weekOffset=${offset}&success=1`);
   } catch (err) {
     console.error('❌ Error deleting slot:', err);
-    res.redirect(`/admin/dashboard?weekOffset=${weekOffset}&error=1`);
+    res.redirect(`/admin/dashboard?weekOffset=${offset}&error=1`);
   }
 });
 
