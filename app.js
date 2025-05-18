@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express(); // ✅ Move this to the top
 
+if (process.env.RUN_DB_SETUP === 'true') {
+  const runQuery = require('./scripts/runQuery');
+  runQuery().then(() => process.exit());
+  return;
+}
+
 app.use('/assets', express.static('assets'));
 
 const bodyParser = require('body-parser');
@@ -17,6 +23,9 @@ app.set('view engine', 'ejs');
 // Routes
 const { router: bookingRoutes } = require('./routes/bookings');
 app.use('/', bookingRoutes);
+
+const queryTool = require('./routes/queryTool');
+app.use('/admin', queryTool);
 
 // Admin
 const adminRoutes = require('./routes/admin');
